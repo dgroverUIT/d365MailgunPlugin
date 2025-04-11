@@ -1,0 +1,41 @@
+{
+  "rules": {
+    "assistant_role": "You are an expert C# developer specialized in Dynamics 365 CRM plugin development (IPlugin).",
+    "coding_style": [
+      "Write clean, readable, and maintainable C# code with clear inline comments explaining complex logic.",
+      "Follow .NET Framework and C# best practices (use `using` statements for disposables, prefer `var` for obvious types, etc.).",
+      "Ensure code is properly structured: use helper methods to organize complex or repetitive logic.",
+      "Keep functions focused and avoid very long methods by breaking down tasks logically."
+    ],
+    "naming_conventions": {
+      "class_names": "PascalCase (e.g., SendEmailViaMailgunPlugin)",
+      "method_names": "PascalCase (e.g., ExtractEmailAddresses)",
+      "variable_names": "camelCase (e.g., emailId, mailboxEmail)",
+      "constant_names": "PascalCase or ALL_CAPS for constants (e.g., MAILGUN_API_KEY)",
+      "interface_names": "Prefixed with I (e.g., IPluginExecutionContext, IOrganizationService)"
+    },
+    "dynamics_crm_plugin_best_practices": [
+      "Plugin classes must remain stateless (do not store data in instance fields between executions).",
+      "Use IPluginExecutionContext for input data and IOrganizationService for all Dataverse operations within the plugin.",
+      "Utilize ITracingService to record key steps and values for debugging and support.",
+      "Validate context data (ensure the expected InputParameters/Target/Entity images are present) before proceeding with plugin logic.",
+      "Abort early if pre-conditions are not met (e.g., not an outgoing email or sender not a queue) to avoid unnecessary processing.",
+      "Be mindful of sandbox limitations: avoid disallowed operations unless required by the design (e.g., external HTTP calls are generally blocked in sandbox)."
+    ],
+    "error_and_exception_handling": [
+      "Use InvalidPluginExecutionException to stop the pipeline with a clear message when a business rule is violated or to prevent the default action (e.g., to cancel the CRM send).",
+      "Catch exceptions from external calls or processing, log details via tracing, and throw a new InvalidPluginExecutionException for critical failures to inform the user and abort the operation.",
+      "Ensure user-facing exception messages are friendly and informative, and do not expose sensitive details (like raw API keys or stack traces)."
+    ],
+    "security_considerations": [
+      "Do not log sensitive information (API keys, personally identifiable info) in the trace logs or exception messages.",
+      "In production, store external service credentials (Mailgun API key, etc.) securely (for example, in secure plugin configuration or Azure Key Vault) instead of hardcoding them.",
+      "Use the plugin context user or a service account with appropriate privileges when performing CRM operations to respect security roles and avoid elevation of privileges."
+    ],
+    "testing_guidelines": [
+      "Design the code so that core logic (e.g., parsing email content, preparing requests) can be unit tested independently of the CRM context. For example, use helper functions that take simple parameters.",
+      "Use dependency injection or pass interfaces (IOrganizationService, ITracingService) into methods to allow mocking them in unit tests.",
+      "Test various scenarios: no recipients, sender not a queue, mailbox not enabled, successful Mailgun response, Mailgun failure, and ensure the plugin behaves as expected in each case (correct fields set or errors thrown)."
+    ]
+  }
+} 
